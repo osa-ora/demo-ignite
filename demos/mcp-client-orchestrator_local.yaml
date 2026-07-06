@@ -1,0 +1,61 @@
+name: MCP Server Client Orchestrator
+
+repo: https://github.com/osa-ora/ocp-ai-mcp-client-demo
+port: 8081
+
+prerequisites:
+  steps:
+    - type: check_python
+      min_version: "3.12"
+
+    - type: check_available
+      command: pip
+      args: ["--version"]
+
+    - type: check_available
+      command: git
+      args: ["--version"]
+
+install:
+  steps:
+    - type: clone_git
+      repo: https://github.com/osa-ora/ocp-ai-mcp-client-demo
+      path: "{{workspace}}/ocp-ai-mcp-client-demo"
+
+    - type: venv
+      path: "{{workspace}}/ocp-ai-mcp-client-demo"
+
+    - type: install_requirements
+      path: "{{workspace}}/ocp-ai-mcp-client-demo"
+
+run:
+  steps:
+    - type: env
+      variables:
+        PORT: "{{port}}"
+
+    - type: run_process
+      path: "{{workspace}}/ocp-ai-mcp-client-demo"
+      mode: terminal
+      command: "./.venv/bin/python app.py"
+
+    - type: wait
+      seconds: 10
+
+    - type: open_url
+      url: "http://localhost:{{port}}"
+
+health:
+  steps:
+    - type: health
+      url: "http://localhost:{{port}}/health"
+      retries: 10
+      delay_seconds: 2
+
+cleanup:
+  steps:
+    - type: kill_port
+      port: "{{port}}"
+
+    - type: delete_directory
+      path: "{{workspace}}/ocp-ai-mcp-client-demo"

@@ -1,0 +1,89 @@
+name: Java Binary Deployment on OCP
+repo: https://github.com/osa-ora/java-ocp-demo
+port: 8080
+
+prerequisites:
+  steps:
+    - type: check_available
+      command: oc
+      args: ["version"]
+
+    - type: check_available
+      command: oc
+      args: ["whoami"]
+
+    - type: check_available
+      command: git
+      args: ["--version"]
+
+    - type: check_java
+      min_version: 11
+
+    - type: check_available
+      command: mvn
+      args: ["--version"]
+
+install:
+  steps:
+    - type: oc_command
+      command: delete project java-bin
+      ignore_error: true
+
+    - type: oc_command
+      command: new-project java-bin
+
+    - type: clone_git
+      repo: https://github.com/osa-ora/java-ocp-demo
+      path: "{{workspace}}/java-ocp-demo"
+
+    - type: shell_command
+      command: mvn clean package -DskipTests
+      path: "{{workspace}}/java-ocp-demo"
+
+    - type: shell_command
+      command: mkdir -p deploy && cp ./target/demo-0.0.1-SNAPSHOT.jar ./deploy/
+      path: "{{workspace}}/java-ocp-demo"
+    
+    # source to image demo frin local git demo
+    - type: shell_command
+      command: oc new-app --image-stream=openshift/java:11 --name=my-java-app . -n java-bin
+      path: "{{workspace}}/java-ocp-demo"
+    
+    # Binary demo
+    - type: shell_command
+      command: oc start-build my-java-app --from-dir=. -n java-bin
+      path: "{{workspace}}/java-ocp-demo/deploy"
+
+    - type: oc_command
+      command: expose service/my-java-app -n java-bin
+      
+    - type: oc_command
+      command: wait --for=condition=available deployment/my-java-app -n java-bin --timeout=180s
+      ignore_error: true
+      
+    - type: oc_command
+      command: get route my-java-app -n java-bin -o jsonpath='{.spec.host}'
+      register: JAVA_APP_ROUTE
+      
+    - type: open_url
+      url: "http://{{JAVA_APP_ROUTE}}/loyalty/v1/balance/1000"
+
+health:
+  steps:
+    - type: oc_command
+      command: get route my-java-app -n java-bin -o jsonpath='{.spec.host}'
+      register: JAVA_APP_ROUTE
+
+    - type: health
+      url: "http://{{JAVA_APP_ROUTE}}/loyalty/v1/balance/1000"
+      retries: 10
+      delay_seconds: 5
+
+cleanup:
+  steps:
+    - type: oc_command
+      command: delete project java-bin
+      ignore_error: true
+
+    - type: delete_directory
+      path: "{{workspace}}/java-ocp-demo"

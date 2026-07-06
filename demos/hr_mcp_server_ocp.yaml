@@ -1,0 +1,91 @@
+name: HR MCP Server Demo on OCP
+
+repo: https://github.com/osa-ora/hr-mcp-agent-demo
+port: 80
+
+prerequisites:
+  steps:
+    - type: check_available
+      command: oc
+      args: ["version"]
+
+    - type: check_available
+      command: curl
+      args: ["--version"]
+
+    - type: check_available
+      command: oc
+      args: ["whoami"]
+
+install:
+  steps:
+    - type: oc_command
+      command: delete project hr-mcp
+      ignore_error: true
+      
+    - type: oc_command
+      command: new-project hr-mcp
+
+    - type: oc_command
+      command: new-app postgresql-persistent --param=POSTGRESQL_USER=postgres --param=POSTGRESQL_PASSWORD=postgres --param=POSTGRESQL_DATABASE=hrdb --name=postgresql -n hr-mcp
+
+    - type: oc_command
+      command: rollout status dc/postgresql -n hr-mcp --timeout=180s
+
+    - type: oc_command
+      command: get pod -l deploymentconfig=postgresql -n hr-mcp -o jsonpath='{.items[0].metadata.name}'
+      register: POSTGRES_POD
+   
+    - type: oc_command
+      command: exec {{POSTGRES_POD}} -n hr-mcp -- bash -c "until pg_isready -U postgres; do sleep 2; done"
+    
+    - type: oc_command
+      command: exec {{POSTGRES_POD}} -n hr-mcp -- bash -c "psql -U postgres -c 'CREATE DATABASE hrdb;'"
+      ignore_error: true
+
+    - type: oc_command
+      command: exec {{POSTGRES_POD}} -n hr-mcp -- bash -c "curl -s https://raw.githubusercontent.com/osa-ora/ocp-ai-custom-mcp-demo/main/db_scripts/schema.sql | psql -U postgres -d hrdb"
+
+    - type: oc_command
+      command: exec {{POSTGRES_POD}} -n hr-mcp -- bash -c "curl -s https://raw.githubusercontent.com/osa-ora/ocp-ai-custom-mcp-demo/main/db_scripts/load_sample_data.sql | psql -U postgres -d hrdb"
+
+    - type: oc_command
+      command: apply -f https://raw.githubusercontent.com/osa-ora/ocp-ai-custom-mcp-demo/refs/heads/main/ocp/configmap.yaml -n hr-mcp
+
+    - type: oc_command
+      command: apply -f https://raw.githubusercontent.com/osa-ora/ocp-ai-custom-mcp-demo/refs/heads/main/ocp/secret.yaml -n hr-mcp
+
+    - type: oc_command
+      command: new-app python:3.12-minimal-ubi10~https://github.com/osa-ora/hr-mcp-agent-demo --name=hr-mcp-server -n hr-mcp
+
+    - type: oc_command
+      command: set env deployment/hr-mcp-server --from=configmap/hr-mcp-config -n hr-mcp
+
+    - type: oc_command
+      command: set env deployment/hr-mcp-server --from=secret/hr-mcp-secret -n hr-mcp
+
+    - type: oc_command
+      command: rollout restart deployment/hr-mcp-server -n hr-mcp
+
+    - type: oc_command
+      command: expose svc/hr-mcp-server -n hr-mcp
+
+health:
+  steps:
+    - type: oc_command
+      command: wait --for=condition=available deployment/hr-mcp-server -n hr-mcp --timeout=180s
+
+    - type: oc_command
+      command: get route hr-mcp-server -n hr-mcp -o jsonpath='{.spec.host}'
+      register: MCP_ROUTE
+
+    - type: mcp_check
+      endpoint: "http://{{MCP_ROUTE}}/mcp"
+      retries: 10
+      delay_seconds: 2
+
+cleanup:
+  steps:
+    - type: oc_command
+      command: delete project hr-mcp
+      ignore_error: true

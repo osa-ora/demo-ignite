@@ -1,0 +1,73 @@
+name: Java Podman Demo
+
+repo: https://github.com/osa-ora/java-ocp-demo
+port: 8080
+
+prerequisites:
+  steps:
+    - type: check_available
+      command: podman
+      args: ["--version"]
+
+    - type: check_available
+      command: git
+      args: ["--version"]
+
+    - type: check_java
+      min_version: 11
+
+    - type: check_available
+      command: mvn
+      args: ["--version"]
+
+install:
+  steps:
+    - type: shell_command
+      command: podman rm -f java-demo
+      ignore_error: true
+
+    - type: clone_git
+      repo: https://github.com/osa-ora/java-ocp-demo
+      path: "{{workspace}}/java-ocp-demo"
+
+    - type: shell_command
+      command: mvn clean package -DskipTests
+      path: "{{workspace}}/java-ocp-demo"
+
+    - type: shell_command
+      command: podman build -t java-demo .
+      path: "{{workspace}}/java-ocp-demo"
+
+    - type: shell_command
+      command: podman run -d --name java-demo -p {{port}}:8080 java-demo
+
+run:
+  steps:
+    - type: port_check
+      host: localhost
+      port: "{{port}}"
+      retries: 10
+      delay_seconds: 2
+
+    - type: open_url
+      url: "http://localhost:{{port}}/loyalty/v1/balance/1000"
+
+health:
+  steps:
+    - type: health
+      url: "http://localhost:{{port}}/loyalty/v1/balance/1000"
+      retries: 10
+      delay_seconds: 5
+
+cleanup:
+  steps:
+    - type: shell_command
+      command: podman stop java-demo
+      ignore_error: true
+
+    - type: shell_command
+      command: podman rm java-demo
+      ignore_error: true
+
+    - type: delete_directory
+      path: "{{workspace}}/java-ocp-demo"

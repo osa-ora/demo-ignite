@@ -1,0 +1,60 @@
+name: Weather MCP Server Demo
+
+repo: https://github.com/osa-ora/weather-mcp-server
+port: 80
+
+prerequisites:
+  steps:
+    - type: check_available
+      command: curl
+      args: ["--version"]
+    - type: check_available
+      command: oc
+      args: ["version", "--client"]
+    - type: check_available
+      command: oc
+      args: ["whoami"]
+
+install:
+  steps:
+    - type: oc_command
+      command: whoami
+      
+    - type: oc_command
+      command: delete project weather-mcp
+      ignore_error: true
+      
+    - type: oc_command
+      command: new-project weather-mcp
+      
+    - type: oc_command
+      command: apply -f https://raw.githubusercontent.com/osa-ora/weather-mcp-server/refs/heads/main/config/configmap.yaml -n weather-mcp
+
+    - type: oc_command
+      command: new-app python:3.12-minimal-ubi10~https://github.com/osa-ora/weather-mcp-server --name=weather-mcp-server -n weather-mcp
+      
+    - type: oc_command
+      command: set env deployment/weather-mcp-server --from=configmap/weather-mcp-config -n weather-mcp
+      
+    - type: oc_command
+      command: expose svc/weather-mcp-server -n weather-mcp
+
+health:
+  steps:
+    - type: oc_command
+      command: wait --for=condition=available deployment/weather-mcp-server -n weather-mcp --timeout=180s
+
+    - type: oc_command
+      command: get route weather-mcp-server -n weather-mcp -o jsonpath='{.spec.host}'
+      register: MCP_ROUTE
+
+    - type: mcp_check
+      endpoint: "http://{{MCP_ROUTE}}/mcp"
+      retries: 10
+      delay_seconds: 2
+
+cleanup:
+  steps:
+    - type: oc_command
+      command: delete project weather-mcp
+      ignore_error: true

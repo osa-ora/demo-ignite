@@ -1,0 +1,83 @@
+name: Apache Camel Integration Demo on OCP
+repo: https://github.com/osa-ora/camel-Integration-demo
+port: 8080
+
+prerequisites:
+  steps:
+    - type: check_available
+      command: git
+      args: ["--version"]
+    
+    - type: check_available
+      command: oc
+      args: ["version", "--client=true"]
+
+    - type: check_available
+      command: oc
+      args: ["whoami"]
+
+    - type: check_oc_crd
+      kind: Kafka
+      api_group: kafka.strimzi.io
+
+install:
+  steps:
+    - type: oc_command
+      command: delete project camel-demo
+      ignore_error: true
+      
+    - type: shell_command
+      command: mkdir -p "{{workspace}}/camel"
+
+    - type: download_file
+      url: "https://raw.githubusercontent.com/osa-ora/camel-Integration-demo/refs/heads/main/scripts/non-stop-setup.sh"
+      path: "{{workspace}}/camel/setup-script.sh"
+
+    - type: shell_command
+      command: chmod +x setup-script.sh
+      path: "{{workspace}}/camel"
+
+    - type: shell_command
+      command: ./setup-script.sh camel-demo
+      path: "{{workspace}}/camel"
+
+    - type: oc_command
+      command: rollout status deployment/camel-app -n camel-demo --timeout=300s
+
+    - type: oc_command
+      command: get route camel-app -n camel-demo -o jsonpath='{.spec.host}'
+      register: CAMEL_APP_ROUTE
+      
+    - type: health
+      url: "http://{{CAMEL_APP_ROUTE}}/user/1"
+      retries: 10
+      delay_seconds: 5
+      
+run:
+  steps:
+    - type: oc_command
+      command: get route camel-app -n camel-demo -o jsonpath='{.spec.host}'
+      register: CAMEL_APP_ROUTE
+      
+    - type: open_url
+      url: "http://{{CAMEL_APP_ROUTE}}/command/TestKafkaMessage?scenario=4"
+
+health:
+  steps:
+    - type: oc_command
+      command: get route camel-app -n camel-demo -o jsonpath='{.spec.host}'
+      register: CAMEL_APP_ROUTE
+
+    - type: health
+      url: "http://{{CAMEL_APP_ROUTE}}/user/1"
+      retries: 10
+      delay_seconds: 5
+
+cleanup:
+  steps:
+    - type: oc_command
+      command: delete project camel-demo
+      ignore_error: true
+
+    - type: delete_directory
+      path: "{{workspace}}/camel"

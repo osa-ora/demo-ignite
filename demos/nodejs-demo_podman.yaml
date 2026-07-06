@@ -1,0 +1,50 @@
+name: Podman Node.js Mac Image Demo
+
+repo: https://github.com/osa-ora/nodejs-demo-app
+port: 8080
+
+prerequisites:
+  steps:
+    - type: check_available
+      command: podman
+      args: ["--version"]
+
+install:
+  steps:
+    - type: shell_command
+      command: podman pull quay.io/ooransa/nodejs-mac-demo:latest
+
+    - type: shell_command
+      command: podman rm -f nodejs-demo
+      ignore_error: true
+
+    - type: shell_command
+      command: podman run -d --name nodejs-demo -p {{port}}:8080 quay.io/ooransa/nodejs-mac-demo:latest
+
+run:
+  steps:
+    - type: port_check
+      host: localhost
+      port: "{{port}}"
+      retries: 10
+      delay_seconds: 2
+
+    - type: open_url
+      url: "http://localhost:{{port}}"
+
+health:
+  steps:
+    - type: health
+      url: "http://localhost:{{port}}"
+      retries: 10
+      delay_seconds: 2
+
+cleanup:
+  steps:
+    - type: shell_command
+      command: podman stop nodejs-demo
+      ignore_error: true
+
+    - type: shell_command
+      command: podman rm nodejs-demo
+      ignore_error: true

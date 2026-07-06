@@ -1,0 +1,51 @@
+name: Java Helm Chart Demo on OCP
+
+repo: https://github.com/osa-ora/java-ocp-demo
+port: 80
+
+prerequisites:
+  steps:
+    - type: check_available
+      command: oc
+      args: ["version"]
+
+    - type: check_available
+      command: helm
+      args: ["version"]
+
+    - type: check_available
+      command: oc
+      args: ["whoami"]
+
+install:
+  steps:
+    - type: oc_command
+      command: delete project java-helm-demo
+      ignore_error: true
+      
+    - type: oc_command
+      command: new-project java-helm-demo
+
+    - type: shell_command
+      command: "helm install my-java-app https://raw.githubusercontent.com/osa-ora/java-ocp-demo/main/helm-chart/releases/java-ocp-demo-0.1.0.tgz -n java-helm-demo"
+
+health:
+  steps:
+    - type: oc_command
+      command: wait --for=condition=available deployment/my-java-app -n java-helm-demo --timeout=180s
+      ignore_error: true
+
+    - type: oc_command
+      command: get route my-java-app -n java-helm-demo -o jsonpath='{.spec.host}'
+      register: JAVA_APP_ROUTE
+
+    - type: health
+      url: "http://{{JAVA_APP_ROUTE}}/loyalty/v1/balance/1000"
+      retries: 10
+      delay_seconds: 5
+
+cleanup:
+  steps:
+    - type: oc_command
+      command: delete project java-helm-demo
+      ignore_error: true

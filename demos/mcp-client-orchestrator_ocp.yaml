@@ -1,0 +1,61 @@
+name: MCP Client Demo on OCP
+
+repo: https://github.com/osa-ora/ocp-ai-mcp-client-demo
+port: 80
+
+prerequisites:
+  steps:
+    - type: check_available
+      command: oc
+      args: ["version", "--client"]
+  
+    - type: check_available
+      command: oc
+      args: ["whoami"]
+
+install:
+  steps:
+    - type: oc_command
+      command: delete project mcp-client
+      ignore_error: true
+      
+    - type: oc_command
+      command: new-project mcp-client
+
+    - type: oc_command
+      command: apply -f https://raw.githubusercontent.com/osa-ora/ocp-ai-mcp-client-demo/main/ocp/configmap.yaml -n mcp-client
+
+    - type: oc_command
+      command: new-app python:3.12-minimal-ubi10~https://github.com/osa-ora/ocp-ai-mcp-client-demo --name=ocp-ai-mcp-client-demo -n mcp-client
+
+    - type: oc_command
+      command: set env deployment/ocp-ai-mcp-client-demo --from=configmap/mcp-client-config -n mcp-client
+
+    - type: oc_command
+      command: rollout status deployment/ocp-ai-mcp-client-demo -n mcp-client --timeout=180s
+
+    - type: oc_command
+      command: expose svc/ocp-ai-mcp-client-demo -n mcp-client
+
+    - type: shell_command
+      command: 'echo CONFIG REQUIRED: please set LLM_BASE_URL and LLM_API_KEY in ConfigMap mcp-client-config in project mcp-client.'
+
+health:
+  steps:
+    - type: oc_command
+      command: wait --for=condition=available deployment/ocp-ai-mcp-client-demo -n mcp-client --timeout=180s
+
+    - type: oc_command
+      command: get route ocp-ai-mcp-client-demo -n mcp-client -o jsonpath='{.spec.host}'
+      register: MCP_ROUTE
+
+    - type: health
+      url: "http://{{MCP_ROUTE}}/health"
+      retries: 10
+      delay_seconds: 2
+
+cleanup:
+  steps:
+    - type: oc_command
+      command: delete project mcp-client
+      ignore_error: true

@@ -1,0 +1,61 @@
+name: Podman Node.js Demo (Git Build)
+
+repo: https://github.com/osa-ora/nodejs-demo-app
+port: 8080
+
+prerequisites:
+  steps:
+    - type: check_available
+      command: podman
+      args: ["--version"]
+
+    - type: check_available
+      command: git
+      args: ["--version"]
+
+install:
+  steps:
+    - type: shell_command
+      command: git clone https://github.com/osa-ora/nodejs-demo-app
+
+    - type: shell_command
+      command: podman build -t nodejs-demo:latest .
+      path: "{{workspace}}/nodejs-demo-app"
+
+    - type: shell_command
+      command: podman rm -f nodejs-demo
+      ignore_error: true
+
+    - type: shell_command
+      command: podman run -d --name nodejs-demo -p {{port}}:8080 nodejs-demo:latest
+
+run:
+  steps:
+    - type: port_check
+      host: localhost
+      port: "{{port}}"
+      retries: 10
+      delay_seconds: 2
+
+    - type: open_url
+      url: "http://localhost:{{port}}"
+
+health:
+  steps:
+    - type: health
+      url: "http://localhost:{{port}}/health"
+      retries: 10
+      delay_seconds: 2
+
+cleanup:
+  steps:
+    - type: shell_command
+      command: podman stop nodejs-demo
+      ignore_error: true
+
+    - type: shell_command
+      command: podman rm nodejs-demo
+      ignore_error: true
+      
+    - type: delete_directory
+      path: "{{workspace}}/nodejs-demo-app"

@@ -1,0 +1,53 @@
+name: OpenShift S2I Node.js Demo
+
+repo: https://github.com/osa-ora/nodejs-demo-app
+port: 8080
+
+prerequisites:
+  steps:
+    - type: check_available
+      command: oc
+      args: ["version", "--client"]
+
+    - type: check_available
+      command: oc
+      args: ["whoami"]
+
+install:
+  steps:
+    - type: oc_command
+      command: delete project nodejs-demo
+      ignore_error: true
+
+    - type: oc_command
+      command: new-project nodejs-demo
+
+    - type: oc_command
+      command: new-app nodejs:20-ubi9~https://github.com/osa-ora/nodejs-demo-app --name=nodejs-demo -n nodejs-demo
+
+    - type: oc_command
+      command: wait --for=condition=available deployment/nodejs-demo -n nodejs-demo --timeout=180s
+
+    - type: oc_command
+      command: expose service/nodejs-demo -n nodejs-demo
+
+run:
+  steps:
+    - type: oc_command
+      command: get route nodejs-demo -n nodejs-demo -o jsonpath='{.spec.host}'
+      register: NODEJS_ROUTE
+
+    - type: open_url
+      url: "http://{{NODEJS_ROUTE}}"
+
+health:
+  steps:
+    - type: health
+      url: "http://{{NODEJS_ROUTE}}/health"
+      retries: 10
+      delay_seconds: 2
+
+cleanup:
+  steps:
+    - type: oc_command
+      command: delete project nodejs-demo

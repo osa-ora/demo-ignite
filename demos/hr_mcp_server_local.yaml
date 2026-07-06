@@ -1,0 +1,82 @@
+name: HR MCP Server Demo
+
+repo: https://github.com/osa-ora/hr-mcp-agent-demo
+port: 8000
+
+prerequisites:
+  steps:
+    - type: check_python
+      min_version: "3.12"
+
+    - type: check_available
+      command: pip
+      args: ["--version"]
+
+    - type: check_available
+      command: git
+      args: ["--version"]
+    
+    - type: check_available
+      command: psql
+      args: ["--version"]
+
+install:
+  steps:
+
+    - type: shell_command
+      command: 'psql postgres -c "CREATE DATABASE hrdb;"'
+      ignore_error: true
+
+    - type: shell_command
+      command: >
+        curl -s https://raw.githubusercontent.com/osa-ora/ocp-ai-custom-mcp-demo/main/db_scripts/schema.sql
+        | psql hrdb
+
+    - type: shell_command
+      command: >
+        curl -s https://raw.githubusercontent.com/osa-ora/ocp-ai-custom-mcp-demo/main/db_scripts/load_sample_data.sql
+        | psql hrdb
+
+    - type: clone_git
+      repo: https://github.com/osa-ora/hr-mcp-agent-demo
+      path: "{{workspace}}/hr-mcp-agent-demo"
+
+    - type: venv
+      path: "{{workspace}}/hr-mcp-agent-demo"
+
+    - type: install_requirements
+      path: "{{workspace}}/hr-mcp-agent-demo"
+
+
+run:
+  steps:
+
+    - type: env
+      variables:
+        PORT: "{{port}}"
+
+    - type: run_process
+      path: "{{workspace}}/hr-mcp-agent-demo"
+      mode: terminal
+      command: "./.venv/bin/python app.py"
+
+
+health:
+  steps:
+
+    - type: mcp_check
+      endpoint: "http://localhost:{{port}}/mcp"
+      retries: 10
+      delay_seconds: 2
+
+cleanup:
+  steps:
+    - type: kill_port
+      port: "{{port}}"
+      
+    - type: shell_command
+      command: 'psql postgres -c "DROP DATABASE hrdb;"'
+      ignore_error: true
+
+    - type: delete_directory
+      path: "{{workspace}}/hr-mcp-agent-demo"

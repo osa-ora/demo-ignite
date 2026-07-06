@@ -1,0 +1,78 @@
+name: OGX Local Demo
+
+repo: https://github.com/osa-ora/ogx-local-demo
+port: 8321
+
+prerequisites:
+  steps:
+    - type: check_python
+      min_version: "3.12"
+      
+    - type: check_available
+      command: uv
+      args: ["--version"]
+
+    - type: check_available
+      command: ollama
+      args: ["--version"]
+
+    - type: check_available
+      command: jupyter
+      args: ["lab", "--version"]
+
+    - type: check_available
+      command: git
+      args: ["--version"]
+
+install:
+  steps:
+
+    - type: shell_command
+      command: "ollama list"
+
+    - type: shell_command
+      command: "ollama pull llama3.2:3b"
+
+    - type: shell_command
+      command: >
+        uv tool install --force 'ogx[starter]'
+        --python 3.13
+        --with "huggingface_hub<0.26.0"
+        --with "sentence-transformers>=2.6.0"
+
+    - type: clone_git
+      repo: https://github.com/osa-ora/ogx-local-demo
+      path: "{{workspace}}/ogx-local-demo"
+
+run:
+  steps:
+
+    - type: env
+      variables:
+        OLLAMA_URL: "http://localhost:11434/v1"
+
+    - type: run_process
+      path: "{{workspace}}/ogx-local-demo"
+      mode: terminal
+      command: "uv run ogx run starter"
+
+    - type: run_process
+      path: "{{workspace}}/ogx-local-demo"
+      mode: terminal
+      command: "jupyter lab ogx-basic-demos/simple-rag-ogx-openai.ipynb"
+health:
+  steps:
+
+    - type: port_check
+      host: localhost
+      port: "{{port}}"
+      retries: 10
+      delay_seconds: 3
+      
+cleanup:
+  steps:
+    - type: kill_port
+      port: "{{port}}"
+
+    - type: delete_directory
+      path: "{{workspace}}/ogx-local-demo"
