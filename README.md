@@ -145,6 +145,8 @@ BASE_RAW_URL = "https://raw.githubusercontent.com/osa-ora/demo-mcp-server/main"
 
 ## 🚀 Quick Start
 
+To deploy it locally on your machine, you will need to have Python installed and follow the following steps:
+
 ```bash
 git clone https://github.com/osa-ora/demo-mcp-server.git
 cd demo-mcp-server
@@ -152,8 +154,18 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 python app.py
+```
+
+Alternatively you can deploy it into OpenShift using the container image from either the GUI or OC command line:
 
 ```
+oc new-project demo-ignite
+oc new-app quay.io/ooransa/demo-ignite:v1 --name=demo-ignite -n demo-ignite
+oc rollout status deployment/demo-ignite
+oc expose svc/demo-ignite -n demo-ignite
+oc get route demo-ignite -n demo-ignite -o jsonpath='{.spec.host}{"\n"}'
+```
+Note: if you deployed to OpenShift then you shouldn't use only OpenShift environment mode.
 
 Then Open any chat client like ChatBox:
 
