@@ -20,6 +20,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app
 
+RUN rm -f /app/index.yaml
+
 RUN chown -R 1001:0 /app && chmod -R g=u /app
 
 USER 1001
