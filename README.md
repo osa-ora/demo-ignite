@@ -1,4 +1,4 @@
-<img width="53" height="54" alt="Screenshot 2026-07-06 at 5 52 31 PM" src="https://github.com/user-attachments/assets/9aeb35bb-1742-435e-82fd-4ceb8b941257" />
+<img width="123" height="124" alt="Screenshot 2026-07-06 at 5 52 31 PM" src="https://github.com/user-attachments/assets/9aeb35bb-1742-435e-82fd-4ceb8b941257" />
 
 # Demo Ignite
 
