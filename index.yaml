@@ -1,0 +1,92 @@
+demos:
+  - id: 1
+    name: MCP Server Client Orchestrator
+    description: Local or OpenShift MCP client orchestrator demonstrating multi-server routing.
+    keywords:
+      - mcp
+      - client
+      - orchestrator
+
+    environments:
+      local:
+        file: https://raw.githubusercontent.com/osa-ora/demo-ignite/refs/heads/main/demos/mcp-client-orchestrator_local.yaml
+
+      openshift:
+        file: https://raw.githubusercontent.com/osa-ora/demo-ignite/refs/heads/main/demos/mcp-client-orchestrator_ocp.yaml
+
+  - id: 2
+    name: HR MCP Server Demo
+    description: This demo runs a Local or OpenShift HR MCP Server.
+    keywords:
+      - HR
+    environments:
+      local:
+        file: https://raw.githubusercontent.com/osa-ora/demo-ignite/refs/heads/main/demos/hr_mcp_server_local.yaml
+
+      openshift:
+        file: https://raw.githubusercontent.com/osa-ora/demo-ignite/refs/heads/main/demos/hr_mcp_server_ocp.yaml
+
+  - id: 3
+    name: Weather MCP Server Demo
+    description: This demo runs a Weather MCP Server either local or in OpenShift.
+    keywords:
+      - Weather
+    environments:
+      local:
+        file: https://raw.githubusercontent.com/osa-ora/demo-ignite/refs/heads/main/demos/weather-mcp-server_local.yaml
+      openshift:
+        file: https://raw.githubusercontent.com/osa-ora/demo-ignite/refs/heads/main/demos/weather-mcp-server_ocp.yaml
+    
+  - id: 4
+    name: OGX RAG Demo
+    description: This demo runs an OGX RAG Demo.
+    keywords:
+      - OGX
+      - RAG
+    environments:
+      local:
+        file: https://raw.githubusercontent.com/osa-ora/demo-ignite/refs/heads/main/demos/ogx-demo_local.yaml
+
+  - id: 5
+    name: Java Helm Demo
+    description: This demo deploy Java application using Helm Charts in OpenShift.
+    keywords:
+      - helm
+    environments:
+      openshift:
+        file: https://raw.githubusercontent.com/osa-ora/demo-ignite/refs/heads/main/demos/java-helm-demo_ocp.yaml
+
+  - id: 6
+    name: Java Deployment Demo
+    description: This demo deploy Java application using Binary build in OpenShift.
+    keywords:
+      - binary
+    environments:
+      openshift:
+        file: https://raw.githubusercontent.com/osa-ora/demo-ignite/refs/heads/main/demos/java-binary-deployment_ocp.yaml
+      podman:
+        file: https://raw.githubusercontent.com/osa-ora/demo-ignite/refs/heads/main/demos/java-demo_podman.yaml
+  
+  - id: 7
+    name: Camel Kafka Streams Integration Demo
+    description: This demo deploy Java Camel application connecting to DB and Kafka Streams in OpenShift.
+    keywords:
+      - streams
+      - kafka
+      - Camel
+    environments:
+      openshift:
+        file: https://raw.githubusercontent.com/osa-ora/demo-ignite/refs/heads/main/demos/camel-kafka-demo_ocp.yaml
+        
+  - id: 8
+    name: NodeJS Deployment Demo
+    description: This demo deploy nodejs application either to Podman using source code or Mac Image or OpenShift S2I
+    keywords:
+      - nodejs
+    environments:
+      openshift:
+        file: https://raw.githubusercontent.com/osa-ora/demo-ignite/refs/heads/main/demos/nodejs-demo_ocp.yaml
+      podman:
+        file: https://raw.githubusercontent.com/osa-ora/demo-ignite/refs/heads/main/demos/nodejs-demo_podman.yaml
+      local:
+        file: https://raw.githubusercontent.com/osa-ora/demo-ignite/refs/heads/main/demos/nodejs-demo_local.yaml
