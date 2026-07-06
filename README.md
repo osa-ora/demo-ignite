@@ -1,3 +1,5 @@
+<img width="53" height="54" alt="Screenshot 2026-07-06 at 5 52 31 PM" src="https://github.com/user-attachments/assets/9aeb35bb-1742-435e-82fd-4ceb8b941257" />
+
 # DemoIgnite
 
 ## Introduction
@@ -246,4 +248,7 @@ Custom steps can override core implementations (last-loaded wins) or you can add
 - Steps are auto-registered at runtime from both core and custom modules
 - Custom steps can override core steps (watch for duplicates like `echo`)
 - Prefer structured steps over raw shell commands when possible.
+
+
+<img width="1304" height="313" alt="Screenshot 2026-07-06 at 5 52 50 PM" src="https://github.com/user-attachments/assets/848d863c-4028-4f79-bbc1-e0cd45e32f65" />
 
