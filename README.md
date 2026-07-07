@@ -169,7 +169,7 @@ oc expose svc/demo-ignite -n demo-ignite
 oc adm policy add-cluster-role-to-user cluster-admin system:serviceaccount:demo-ignite:default
 oc get route demo-ignite -n demo-ignite -o jsonpath='{.spec.host}{"\n"}'
 ```
-Note: if you deployed to OpenShift then you shouldn't use only OpenShift environment mode.
+Note: if you deployed to OpenShift then you MUST use only OpenShift environment mode/demos.
 
 Then Open any chat client like ChatBox:
 
