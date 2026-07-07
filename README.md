@@ -160,10 +160,13 @@ python app.py
 Alternatively you can deploy it into OpenShift using the container image from either the GUI or OC command line:
 
 ```
+# oc login to openshift cluster with admin privilages user
 oc new-project demo-ignite
 oc new-app quay.io/ooransa/demo-ignite:v1 --name=demo-ignite -n demo-ignite
 oc rollout status deployment/demo-ignite
 oc expose svc/demo-ignite -n demo-ignite
+# Grant the service account the admin privilages to be able to create and deploy demos
+oc adm policy add-cluster-role-to-user cluster-admin system:serviceaccount:demo-ignite:default
 oc get route demo-ignite -n demo-ignite -o jsonpath='{.spec.host}{"\n"}'
 ```
 Note: if you deployed to OpenShift then you shouldn't use only OpenShift environment mode.
