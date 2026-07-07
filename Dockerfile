@@ -26,4 +26,4 @@ RUN chown -R 1001:0 /app && chmod -R g=u /app
 
 USER 1001
 
-CMD ["python", "main.py"]
+CMD ["python", "app.py"]
