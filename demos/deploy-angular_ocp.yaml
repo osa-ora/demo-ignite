@@ -1,0 +1,62 @@
+name: OpenShift Angular Deployment Demo
+
+repo: https://github.com/osa-ora/angular-ocp-demo
+port: 8080
+
+prerequisites:
+  steps:
+    - type: check_available
+      command: oc
+      args: ["version", "--client"]
+
+    - type: check_available
+      command: oc
+      args: ["whoami"]
+
+install:
+  steps:
+    - type: oc_command
+      command: delete project angular-demo
+      ignore_error: true
+
+    - type: oc_command
+      command: new-project angular-demo
+
+    - type: oc_command
+      command: new-build --strategy=docker --name=angular-demo https://github.com/osa-ora/angular-ocp-demo
+
+    - type: oc_command
+      command: start-build angular-demo
+
+    - type: oc_command
+      command: wait --for=condition=Complete build/angular-demo-1 --timeout=300s
+
+    - type: oc_command
+      command: new-app angular-demo -n angular-demo
+
+    - type: oc_command
+      command: wait --for=condition=available deployment/angular-demo -n angular-demo --timeout=300s
+
+    - type: oc_command
+      command: expose service/angular-demo -n angular-demo
+
+run:
+  steps:
+    - type: oc_command
+      command: get route angular-demo -n angular-demo -o jsonpath='{.spec.host}'
+      register: ANGULAR_ROUTE
+
+    - type: open_url
+      url: "http://{{ANGULAR_ROUTE}}"
+
+health:
+  steps:
+    - type: health
+      url: "http://{{ANGULAR_ROUTE}}"
+      retries: 15
+      delay_seconds: 2
+
+cleanup:
+  steps:
+    - type: oc_command
+      command: delete project angular-demo
