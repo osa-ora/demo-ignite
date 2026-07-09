@@ -51,6 +51,10 @@ run:
 
 health:
   steps:
+    - type: oc_command
+      command: get route angular-demo -n angular-demo -o jsonpath='{.spec.host}'
+      register: ANGULAR_ROUTE
+      
     - type: health
       url: "http://{{ANGULAR_ROUTE}}"
       retries: 15
