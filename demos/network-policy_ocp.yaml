@@ -71,9 +71,7 @@ install:
 run:
   steps:
 
-    - type: oc_command
-      command: get route quarkus-loyalty-java -n app-project -o jsonpath='{.spec.host}'
-      register: LOYALTY_ROUTE
+
     
     - type: shell_command
       command: curl -s -f http://{{LOYALTY_ROUTE}}/loyalty/v1/balance/1
@@ -96,8 +94,64 @@ run:
 
     - type: shell_command
       command: curl -s -f http://{{LOYALTY_ROUTE}}/loyalty/v1/balance/1
+      
+run:
+  steps:
+    - type: oc_command
+      command: delete -f https://raw.githubusercontent.com/osa-ora/ocp-network-policy-demo/refs/heads/main/policies/deny-all.yaml -n db-project
+      ignore_error: true
 
+    - type: oc_command
+      command: delete -f https://raw.githubusercontent.com/osa-ora/ocp-network-policy-demo/refs/heads/main/policies/permit-policy.yaml -n db-project
+      ignore_error: true
 
+    - type: oc_command
+      command: rollout restart deployment/quarkus-loyalty-java -n app-project
+
+    - type: oc_command
+      command: wait --for=condition=available deployment/quarkus-loyalty-java -n app-project --timeout=180s
+
+    - type: oc_command
+      command: get route quarkus-loyalty-java -n app-project -o jsonpath='{.spec.host}'
+      register: LOYALTY_ROUTE
+    
+    - type: shell_command
+      command: echo "Test Case 1: Testing connectivity using the default (expected success) ..."
+      
+    - type: shell_command
+      command: curl -s -f http://{{LOYALTY_ROUTE}}/loyalty/v1/balance/1
+
+    - type: oc_command
+      command: apply -f https://raw.githubusercontent.com/osa-ora/ocp-network-policy-demo/refs/heads/main/policies/deny-all.yaml -n db-project
+
+    - type: oc_command
+      command: rollout restart deployment/quarkus-loyalty-java -n app-project
+
+    - type: oc_command
+      command: wait --for=condition=available deployment/quarkus-loyalty-java -n app-project --timeout=180s
+      
+    - type: shell_command
+      command: echo "Test Case 2: Testing connectivity after deny-all policy (expected failure) ..."
+      
+    - type: shell_command
+      command: curl -s -f http://{{LOYALTY_ROUTE}}/loyalty/v1/balance/1
+      ignore_error: true
+
+    - type: oc_command
+      command: apply -f https://raw.githubusercontent.com/osa-ora/ocp-network-policy-demo/refs/heads/main/policies/permit-policy.yaml -n db-project
+
+    - type: oc_command
+      command: rollout restart deployment/quarkus-loyalty-java -n app-project
+
+    - type: oc_command
+      command: wait --for=condition=available deployment/quarkus-loyalty-java -n app-project --timeout=180s
+      
+    - type: shell_command
+      command: echo "Test Case 3: Testing connectivity after selective permit policy (expected success) ..."
+      
+    - type: shell_command
+      command: curl -s -f http://{{LOYALTY_ROUTE}}/loyalty/v1/balance/1
+      
 health:
   steps:
     - type: oc_command
