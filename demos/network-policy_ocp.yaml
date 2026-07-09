@@ -71,6 +71,10 @@ install:
 run:
   steps:
 
+    - type: oc_command
+      command: get route quarkus-loyalty-java -n app-project -o jsonpath='{.spec.host}'
+      register: LOYALTY_ROUTE
+    
     - type: shell_command
       command: curl -s -f http://{{LOYALTY_ROUTE}}/loyalty/v1/balance/1
 
@@ -96,7 +100,10 @@ run:
 
 health:
   steps:
-
+    - type: oc_command
+      command: get route quarkus-loyalty-java -n app-project -o jsonpath='{.spec.host}'
+      register: LOYALTY_ROUTE
+      
     - type: health
       url: "http://{{LOYALTY_ROUTE}}/loyalty/v1/balance/1"
       retries: 10
