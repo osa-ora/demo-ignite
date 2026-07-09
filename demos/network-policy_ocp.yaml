@@ -64,8 +64,10 @@ install:
       command: get route quarkus-loyalty-java -n app-project -o jsonpath='{.spec.host}'
       register: LOYALTY_ROUTE
 
-    - type: shell_command
-      command: curl -s -f http://{{LOYALTY_ROUTE}}/loyalty/v1/balance/1
+    - type: curl
+      url: "http://{{LOYALTY_ROUTE}}/loyalty/v1/balance/1"
+      retries: 4
+      delay_seconds: 2
       
 run:
   steps:
