@@ -1,6 +1,6 @@
 from fastmcp import FastMCP
 import demo_engine as engine
-from config import MCP_HOST, MCP_PORT, MCP_TRANSPORT, DEBUG, DEFAULT_WORKSPACE
+from config import MCP_HOST, MCP_PORT, MCP_TRANSPORT, DEBUG, DEFAULT_WORKSPACE, DEFAULT_ENV
 import os
 from typing import Optional
 
@@ -66,7 +66,7 @@ Optionally specify the deployment environment.
 Defaults to "local".
 """
 )
-def get_demo_details(key: str, environment: str = "local"):
+def get_demo_details(key: str, environment: str = DEFAULT_ENV):
     debug(f"Invoke get_demo_details {key}.")
     return engine.fetch_demo_file(key, environment)
 
@@ -88,7 +88,7 @@ Optionally specify the deployment environment.
 Defaults to "local".
 """
 )
-def get_demo_prerequisites(key: str, environment: str = "local"):
+def get_demo_prerequisites(key: str, environment: str = DEFAULT_ENV):
     debug(f"Invoke get_demo_prerequisites {key}.")
 
     demo_def = engine.fetch_demo_file(key, environment)
@@ -120,7 +120,7 @@ This does NOT install anything.
 It only checks system readiness (python, pip, git, etc).
 """
 )
-def validate_demo_prerequisites(key: str, environment: str = "local"):
+def validate_demo_prerequisites(key: str, environment: str = DEFAULT_ENV):
     debug(f"Invoke validate_demo_prerequisites {key}.")
 
     demo_def = engine.fetch_demo_file(key, environment)
@@ -160,10 +160,10 @@ This will:
 def install_demo(
     key: str,
     workspace: Optional[str] = None,
-    environment: str = "local"
+    environment: str = DEFAULT_ENV
 ):
     workspace = workspace or DEFAULT_WORKSPACE
-    environment = environment or "local"
+    environment = environment or DEFAULT_ENV
 
     debug(f"Invoke install_demo {key}.")
 
@@ -195,10 +195,10 @@ This will dry run the following:
 def dry_run_demo(
     key: str,
     workspace: Optional[str] = None,
-    environment: str = "local"
+    environment: str = DEFAULT_ENV
 ):
     workspace = workspace or DEFAULT_WORKSPACE
-    environment = environment or "local"
+    environment = environment or DEFAULT_ENV
 
     debug(f"Invoke dry_run_demo {key}.")
 
@@ -226,10 +226,10 @@ This will start the application process.
 def run_demo(
     key: str,
     workspace: Optional[str] = None,
-    environment: str = "local"
+    environment: str = DEFAULT_ENV
 ):
     workspace = workspace or DEFAULT_WORKSPACE
-    environment = environment or "local"
+    environment = environment or DEFAULT_ENV
 
     debug(f"Invoke run_demo {key}.")
 
@@ -257,10 +257,10 @@ This validates that the application is reachable and working.
 def health_check_demo(
     key: str,
     workspace: Optional[str] = None,
-    environment: str = "local"
+    environment: str = DEFAULT_ENV
 ):
     workspace = workspace or DEFAULT_WORKSPACE
-    environment = environment or "local"
+    environment = environment or DEFAULT_ENV
 
     debug(f"Invoke health_check_demo {key} in {workspace}.")
 
@@ -290,10 +290,10 @@ This will:
 def cleanup_demo(
     key: str,
     workspace: Optional[str] = None,
-    environment: str = "local"
+    environment: str = DEFAULT_ENV
 ):
     workspace = workspace or DEFAULT_WORKSPACE
-    environment = environment or "local"
+    environment = environment or DEFAULT_ENV
 
     debug(f"Invoke cleanup_demo {key}.")
 
