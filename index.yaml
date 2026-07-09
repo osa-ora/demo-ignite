@@ -93,9 +93,19 @@ demos:
 
   - id: 9
     name: Angular Deployment Demo
-    description: This demo deploy Java Camel application connecting to DB and Kafka Streams in OpenShift.
+    description: This demo deploy Angular application using Dockerfile in OpenShift.
     keywords:
       - angular
     environments:
       openshift:
         file: https://raw.githubusercontent.com/osa-ora/demo-ignite/refs/heads/main/demos/deploy-angular_ocp.yaml
+
+  - id: 10
+    name: Network Policy Demo
+    description: This demo show how network policies affect application connectivity to database in 2 different OCP projects.
+    keywords:
+      - network
+      - network_policy
+    environments:
+      openshift:
+        file: https://raw.githubusercontent.com/osa-ora/demo-ignite/refs/heads/main/demos/network-policy_ocp.yaml
