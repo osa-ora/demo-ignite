@@ -137,6 +137,7 @@ MCP_TRANSPORT=http
 MCP_HOST=0.0.0.0
 MCP_PORT=8085
 DEFAULT_WORKSPACE = "/tmp/demos"
+DEFAULT_ENV = "local"
 BASE_RAW_URL = "https://raw.githubusercontent.com/osa-ora/demo-mcp-server/main"
 
 ```
@@ -163,6 +164,7 @@ Alternatively you can deploy it into OpenShift using the container image from ei
 # oc login to openshift cluster with admin privilages user
 oc new-project demo-ignite
 oc new-app quay.io/ooransa/demo-ignite:v1 --name=demo-ignite -n demo-ignite
+oc set env deployment/demo-ignite MCP_PORT=8080 DEFAULT_ENV=openshift
 oc rollout status deployment/demo-ignite -n demo-ignite
 oc expose svc/demo-ignite -n demo-ignite
 # Grant the service account the admin privilages to be able to create and deploy demos
