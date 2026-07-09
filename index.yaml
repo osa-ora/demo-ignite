@@ -90,3 +90,12 @@ demos:
         file: https://raw.githubusercontent.com/osa-ora/demo-ignite/refs/heads/main/demos/nodejs-demo_podman.yaml
       local:
         file: https://raw.githubusercontent.com/osa-ora/demo-ignite/refs/heads/main/demos/nodejs-demo_local.yaml
+
+  - id: 9
+    name: Angular Deployment Demo
+    description: This demo deploy Java Camel application connecting to DB and Kafka Streams in OpenShift.
+    keywords:
+      - angular
+    environments:
+      openshift:
+        file: https://raw.githubusercontent.com/osa-ora/demo-ignite/refs/heads/main/demos/deploy-angular_ocp.yaml
