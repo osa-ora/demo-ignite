@@ -92,6 +92,8 @@ run:
       
     - type: curl
       url: "http://{{LOYALTY_ROUTE}}/loyalty/v1/balance/1"
+      retries: 4
+      delay_seconds: 2
       
     - type: oc_command
       command: apply -f https://raw.githubusercontent.com/osa-ora/ocp-network-policy-demo/refs/heads/main/policies/deny-all.yaml -n db-project
@@ -107,6 +109,8 @@ run:
       
     - type: curl
       url: "http://{{LOYALTY_ROUTE}}/loyalty/v1/balance/1"
+      retries: 4
+      delay_seconds: 2
       ignore_error: true
       
     - type: oc_command
@@ -123,6 +127,8 @@ run:
       
     - type: curl
       url: "http://{{LOYALTY_ROUTE}}/loyalty/v1/balance/1"
+      retries: 4
+      delay_seconds: 2
       
 health:
   steps:
