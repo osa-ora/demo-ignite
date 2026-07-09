@@ -244,6 +244,40 @@ def step_health(ctx, step):
     raise Exception("Health check failed")
 
 # =========================================================
+# CURL
+# =========================================================
+def step_curl(ctx, step):
+    url = resolve_value(step["url"], ctx)
+
+    retries = step.get("retries", 1)
+    delay = step.get("delay_seconds", 2)
+
+    print(f"CURL check: {url}")
+
+    for _ in range(retries):
+        try:
+            r = requests.get(url, timeout=5)
+
+            if r.status_code < 400:
+                output = r.text.strip()
+                ctx["log"].append(f"OUTPUT: {output}")
+                print(f"OUTPUT: {output}")
+                return ctx
+
+            error = f"HTTP {r.status_code}: {r.text}"
+
+        except Exception as e:
+            error = str(e)
+
+        if step.get("ignore_error"):
+            ctx["log"].append(f"[IGNORED ERROR] {error}")
+            print(f"OUTPUT IGNORED ERROR: {error}")
+            return ctx
+
+        time.sleep(delay)
+
+    raise Exception(f"CURL check failed: {error}")
+# =========================================================
 # MCP CHECK
 # =========================================================
 
