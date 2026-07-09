@@ -163,7 +163,7 @@ Alternatively you can deploy it into OpenShift using the container image from ei
 # oc login to openshift cluster with admin privilages user
 oc new-project demo-ignite
 oc new-app quay.io/ooransa/demo-ignite:v1 --name=demo-ignite -n demo-ignite
-oc rollout status deployment/demo-ignite
+oc rollout status deployment/demo-ignite -n demo-ignite
 oc expose svc/demo-ignite -n demo-ignite
 # Grant the service account the admin privilages to be able to create and deploy demos
 oc adm policy add-cluster-role-to-user cluster-admin system:serviceaccount:demo-ignite:default
