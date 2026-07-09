@@ -90,9 +90,9 @@ run:
     - type: echo
       message: "Test Case 1: Testing connectivity using the default (expected success) ..."
       
-    - type: shell_command
-      command: curl -s -f http://{{LOYALTY_ROUTE}}/loyalty/v1/balance/1
-
+    - type: curl
+      url: "http://{{LOYALTY_ROUTE}}/loyalty/v1/balance/1"
+      
     - type: oc_command
       command: apply -f https://raw.githubusercontent.com/osa-ora/ocp-network-policy-demo/refs/heads/main/policies/deny-all.yaml -n db-project
 
@@ -105,10 +105,10 @@ run:
     - type: echo
       message: "Test Case 2: Testing connectivity after deny-all policy (expected failure) ..."
       
-    - type: shell_command
-      command: curl -s -f http://{{LOYALTY_ROUTE}}/loyalty/v1/balance/1
+    - type: curl
+      url: "http://{{LOYALTY_ROUTE}}/loyalty/v1/balance/1"
       ignore_error: true
-
+      
     - type: oc_command
       command: apply -f https://raw.githubusercontent.com/osa-ora/ocp-network-policy-demo/refs/heads/main/policies/permit-policy.yaml -n db-project
 
@@ -121,8 +121,8 @@ run:
     - type: echo
       message: "Test Case 3: Testing connectivity after selective permit policy (expected success) ..."
       
-    - type: shell_command
-      command: curl -s -f http://{{LOYALTY_ROUTE}}/loyalty/v1/balance/1
+    - type: curl
+      url: "http://{{LOYALTY_ROUTE}}/loyalty/v1/balance/1"
       
 health:
   steps:
