@@ -11,9 +11,9 @@ It does not replace existing tools. Instead, it adds a lightweight AI orchestrat
 
 The advantages of using this project can be summarized as follows:
 
-1. **Build a centralized demo catalog**, where all demos are described using a simple YAML format and can be easily discovered, shared, and reused.
-2. **Provision demos using natural language** through any AI chat interface.
-3. **Reuse your existing automation assets**, including scripts, `oc` commands, GitOps YAML files, cloud provider SDKs, Ansible playbooks, and other deployment tools.
+1. **Provision demos using natural language** through any AI chat interface.
+2. **Reuse your existing automation assets**, including scripts, `oc` commands, GitOps YAML files, cloud provider SDKs, Ansible playbooks, and other deployment tools.
+3. **Build a centralized demo catalog**, where all demos are described using a simple YAML format and can be easily discovered, shared, and reused.
 4. **Make technical demos accessible to non-technical users**, allowing anyone to provision and run demos without requiring deep platform expertise.
 5. **Share standardized demos with customers**, providing a simple and repeatable way to deploy demonstration environments.
 6. **Quickly customize demos using AI** by creating or modifying simple YAML demo definitions instead of writing new automation from scratch.
