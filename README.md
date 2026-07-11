@@ -91,6 +91,8 @@ cleanup:
       path: "{{workspace}}/weather-mcp-server-demo"
 ```
 
+See the [Demo Lifecycle Documentation](docs/demo_lifecycle_docs.md) for details about prerequisites, install, run, health, cleanup and other demo lifecycle operations.
+
 ## Architecture: 
 
 The overall architecture looks like: 
@@ -262,6 +264,8 @@ Custom steps can override core implementations (last-loaded wins) or you can add
 - aws_command
 - az_command
 - gcloud_command
+
+See the [Demo Steps Documentation](docs/steps_docs.md) for details about how to use the different supported step types.
 
 ## 🧪 Notes
 - Steps are auto-registered at runtime from both core and custom modules
