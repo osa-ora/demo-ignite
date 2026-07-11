@@ -126,3 +126,104 @@ Supported by:
 - `mcp_check`
 - `port_check`
 - `no_running_check`
+
+---
+
+# Extending the Demo Engine with Custom Steps
+
+In addition to the built-in core steps, the Demo MCP Server supports custom step implementations. These are loaded automatically from `custom_steps_utils.py` during startup and are available exactly like any built-in step.
+
+Custom steps are useful for adding organization-specific functionality without modifying the core execution engine.
+
+## Available Custom Steps
+
+### `aws_command`
+
+Executes an AWS CLI command.
+
+Supports:
+
+- `register`
+- `ignore_error`
+
+Example:
+
+```yaml
+- type: aws_command
+  command: s3 ls
+```
+
+or
+
+```yaml
+- type: aws_command
+  command: eks list-clusters
+```
+
+---
+
+### `az_command`
+
+Executes an Azure CLI (`az`) command.
+
+Supports:
+
+- `register`
+- `ignore_error`
+
+Example:
+
+```yaml
+- type: az_command
+  command: group list
+```
+
+or
+
+```yaml
+- type: az_command
+  command: aks list
+```
+
+---
+
+### `gcloud_command`
+
+Executes a Google Cloud CLI (`gcloud`) command.
+
+Supports:
+
+- `register`
+- `ignore_error`
+
+Example:
+
+```yaml
+- type: gcloud_command
+  command: projects list
+```
+
+or
+
+```yaml
+- type: gcloud_command
+  command: container clusters list
+```
+
+---
+
+## Creating Custom Steps
+
+Any Python function following the naming convention
+
+```python
+def step_my_custom_step(ctx, step):
+```
+
+is automatically registered by the Demo MCP Server and becomes available in YAML as:
+
+```yaml
+- type: my_custom_step
+```
+
+No additional registration is required. During startup, the engine scans both `core_steps_utils.py` and `custom_steps_utils.py` and automatically discovers every function whose name begins with `step_`.
