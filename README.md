@@ -252,6 +252,7 @@ Custom steps can override core implementations (last-loaded wins) or you can add
 ## 🧰 Utility Operations
 - download_file
 - delete_directory
+- curl
 - kill_port
 - echo 
 
