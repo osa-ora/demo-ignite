@@ -4,9 +4,14 @@
 
 ## Introduction
 
-DemoIgnite is an open-source AI-powered demo automation platform that automates the provisioning and lifecycle management of demo environments.
+DemoIgnite is an open-source, AI-powered demo automation platform that automates the provisioning, execution, and lifecycle management of technical demos.
 
-It does not replace existing tools. Instead, it adds a lightweight AI orchestration layer that allows existing automation assets (scripts, CLI tools, GitOps manifests, and SDKs) to be executed using natural language.
+Rather than replacing existing automation tools, DemoIgnite adds a lightweight AI orchestration layer that enables existing automation assets—such as scripts, CLI tools, GitOps manifests, SDKs, and playbooks—to be executed through natural language.
+
+DemoIgnite consists of two main components:
+- Demo Engine, which executes the demo lifecycle.
+- MCP Server, which exposes the lifecycle operations as AI tools.
+
 ## Benefits
 
 The advantages of using this project can be summarized as follows:
@@ -20,7 +25,7 @@ The advantages of using this project can be summarized as follows:
 7. **Reduce the time and effort required to prepare customer-specific demos**, enabling faster and more consistent demo delivery.
 8. **Standardize demo provisioning across teams**, ensuring demos are reproducible, maintainable, and easy to share.
 
-By combining AI with a lightweight YAML-based demo definition, the project transforms existing deployment knowledge into a reusable demo catalog that can be executed consistently through natural language by anyone.
+By combining AI with lightweight YAML-based demo definitions, DemoIgnite transforms existing deployment knowledge into a reusable demo catalog that can be provisioned, executed, and managed consistently through natural language.
 
 ## System Overview
 
